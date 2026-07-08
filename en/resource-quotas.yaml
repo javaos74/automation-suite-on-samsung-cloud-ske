@@ -1,0 +1,62 @@
+# ResourceQuotas for UiPath Automation Suite namespaces
+#
+# Purpose:
+#   Some Kubernetes distributions (including SKE) enforce resource quotas
+#   for namespaces using system-critical priority classes. Without these
+#   quotas, pods with system-node-critical or system-cluster-critical
+#   priority classes may fail to schedule.
+#
+# Apply:
+#   kubectl apply -f resource-quotas.yaml
+#
+# Verify:
+#   kubectl get resourcequota -A | grep critical-pods
+
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: critical-pods
+  namespace: istio-system
+spec:
+  hard:
+    pods: "1000"
+  scopeSelector:
+    matchExpressions:
+    - operator: In
+      scopeName: PriorityClass
+      values:
+      - system-node-critical
+      - system-cluster-critical
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: critical-pods
+  namespace: argocd
+spec:
+  hard:
+    pods: "1000"
+  scopeSelector:
+    matchExpressions:
+    - operator: In
+      scopeName: PriorityClass
+      values:
+      - system-node-critical
+      - system-cluster-critical
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: critical-pods
+  namespace: uipath
+spec:
+  hard:
+    pods: "1000"
+  scopeSelector:
+    matchExpressions:
+    - operator: In
+      scopeName: PriorityClass
+      values:
+      - system-node-critical
+      - system-cluster-critical

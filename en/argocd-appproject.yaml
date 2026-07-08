@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: uipath
+  namespace: argocd
+spec:
+  description: App project to manage and deploy UiPath Automation Suite applications
+  # Allow all cluster-scoped resources
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  # Allowed deployment targets
+  destinations:
+    - namespace: uipath
+      server: https://kubernetes.default.svc
+    - namespace: istio-system
+      server: https://kubernetes.default.svc
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  # Allow ArgoCD namespace as source
+  sourceNamespaces:
+    - argocd
+  # Allow all repository sources
+  sourceRepos:
+    - '*'

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nvidia-mig-config
+  namespace: kube-system
+data:
+  # MIG configuration for NVIDIA A100 80GB
+  # Each profile defines how the GPU is partitioned into MIG instances.
+  # Choose ONE profile based on your workload requirements.
+  #
+  # Profile options for A100-80GB:
+  #   - "all-1g.10gb"    : 7 x 1g.10gb instances (max parallelism, small models)
+  #   - "all-2g.20gb"    : 3 x 2g.20gb instances (balanced)
+  #   - "all-3g.40gb"    : 2 x 3g.40gb instances (medium models)
+  #   - "all-7g.80gb"    : 1 x 7g.80gb instance  (single large model, no MIG)
+  #   - "mixed-balanced" : 1 x 3g.40gb + 2 x 2g.20gb (mixed workloads)
+  #
+  # Reference: https://docs.nvidia.com/datacenter/tesla/mig-user-guide/
+  config.yaml: |
+    version: v1
+    mig-configs:
+      # Recommended for UiPath AI Center: balanced profile
+      # Provides 3 GPU instances suitable for ML model training/inference
+      all-2g.20gb:
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "2g.20gb": 3
+
+      # Alternative: maximum parallelism for lightweight inference
+      all-1g.10gb:
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "1g.10gb": 7
+
+      # Alternative: large model training (2 instances)
+      all-3g.40gb:
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "3g.40gb": 2
+
+      # Alternative: full GPU (no MIG partition)
+      all-7g.80gb:
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "7g.80gb": 1
+
+      # Alternative: mixed workload profile
+      mixed-balanced:
+        - devices: all
+          mig-enabled: true
+          mig-devices:
+            "3g.40gb": 1
+            "2g.20gb": 2

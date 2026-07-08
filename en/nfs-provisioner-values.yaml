@@ -1,0 +1,56 @@
+# NFS Subdir External Provisioner Helm Values
+# Used for providing RWX (ReadWriteMany) storage in Samsung Cloud SKE
+#
+# Install command:
+#   helm install nfs-provisioner \
+#     oci://<registry>/helm/nfs/nfs-subdir-external-provisioner \
+#     --namespace nfs-system --create-namespace \
+#     -f nfs-provisioner-values.yaml
+
+nfs:
+  server: "<NFS_SERVER_IP>"
+  path: "/exported/path"
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - timeo=600
+    - retrans=3
+
+storageClass:
+  name: nfs-subdir-external-sc
+  defaultClass: true
+  reclaimPolicy: Delete
+  allowVolumeExpansion: true
+  archiveOnDelete: false
+  accessModes: ReadWriteMany
+
+# Create a second StorageClass with Retain policy
+# for critical data that should not be deleted
+additionalStorageClasses:
+  - name: nfs-subdir-external-sc-retain
+    defaultClass: false
+    reclaimPolicy: Retain
+    allowVolumeExpansion: true
+    archiveOnDelete: true
+    accessModes: ReadWriteMany
+
+# Image configuration for airgapped environment
+image:
+  repository: "<TARGET_REGISTRY>/mirror/nfs-subdir-external-provisioner"
+  tag: "v4.0.2"
+  pullPolicy: IfNotPresent
+
+# Resource limits
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Run on general worker nodes (avoid tainted nodes)
+tolerations: []
+
+# Replica count
+replicaCount: 1

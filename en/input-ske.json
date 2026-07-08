@@ -1,0 +1,274 @@
+{
+  "registries": {
+    "docker": {
+      "url": "<samsung-cloud-registry-url>"
+    },
+    "helm": {
+      "url": "<samsung-cloud-registry-url>"
+    }
+  },
+  "fqdn": "<fqdn>",
+  "profile": "lite",
+  "namespace": "uipath",
+  "fabric": {
+    "redis": {
+      "hostname": "<redis-host>",
+      "password": "<redis-password>",
+      "port": 6380,
+      "tls": true
+    }
+  },
+  "zone_resilience": false,
+  "telemetry_optout": false,
+  "fips_enabled_nodes": false,
+  "external_object_storage": {
+    "enabled": true,
+    "storage_type": "s3",
+    "fqdn": "<object-store-fqdn>",
+    "port": 443,
+    "access_key": "<access-key>",
+    "secret_key": "<secret-key>",
+    "region": "<region>", 
+    "create_bucket": false,
+    "bucket_name_prefix": "",
+    "bucket_name_suffix": "",
+    "use_instance_profile": false
+  },
+  "cluster_type": "exclusive",
+  "kubernetes_distribution": "vanilla",
+  "sql_connection_string_template": "Server=tcp:<sql-host>,1433;Initial Catalog=DB_NAME_PLACEHOLDER;Persist Security Info=False;User Id=<sql-user>;Password='<sql-password>';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Max Pool Size=100;",
+  "sql_connection_string_template_jdbc": "jdbc:sqlserver://<sql-host>;database=DB_NAME_PLACEHOLDER;user=<sql-user>;password={<sql-password>};encrypt=true;trustServerCertificate=false;loginTimeout=30;",
+  "sql_connection_string_template_odbc": "SERVER=<sql-host>;DATABASE=DB_NAME_PLACEHOLDER;DRIVER={ODBC Driver 17 for SQL Server};UID=<sql-user>;PWD={<sql-password>};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;",
+  "sql_connection_string_template_sqlalchemy_pyodbc": "mssql+pyodbc://<sql-user>:<sql-password-urlencoded>@<sql-host>:1433/DB_NAME_PLACEHOLDER?driver=ODBC+Driver+17+for+SQL+Server&TrustServerCertificate=no&Encrypt=yes",
+  "postgresql_connection_string_template_sqlalchemy_pyodbc": "postgresql+psycopg2://<pgsql-user>:<pgsql-password>@<pgsql-host>:5432/DB_NAME_PLACEHOLDER",
+  "postgresql_connection_string_template_sqlalchemy_asyncpg": "postgresql+asyncpg://<pgsql-user>:<pgsql-password>@<pgsql-host>:5432/DB_NAME_PLACEHOLDER",
+  "sql": {
+    "create_db": true,
+    "server_url": "<sql-host>",
+    "port": "1433",
+    "username": "<sql-user>",
+    "password": "<sql-password>"
+  },
+  "postgresql": {
+    "create_db": true,
+    "server_url": "<psql-host>",
+    "port": "5432",
+    "username": "<pgsql-user>",
+    "password": "<pgsql-password>"
+  },
+  "admin_username": "admin",
+  "admin_password": "<admin-password>",
+  "dataservice": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "orchestrator": {
+    "enabled": true,
+    "testautomation": {
+      "enabled": true
+    },
+    "updateserver": {
+      "enabled": true
+    },
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "integrationservices": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "studioweb": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "processmining": {
+    "enabled": false,
+    "profile": "lite"
+  },
+  "insights": {
+    "enabled": false,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "task_mining": {
+    "enabled": false,
+    "profile": "lite"
+  },
+  "automation_hub": {
+    "enabled": false,
+    "profile": "lite"
+  },
+  "automation_ops": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "aicenter": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "documentunderstanding": {
+    "enabled": false,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "test_manager": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "action_center": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "apps": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "asrobots": {
+    "packagecaching": true,
+    "packagecachefolder": "/uipath_asrobots_package_cache",
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "ecs": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "llmobservability": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "trace_retention_in_days": 7,
+    "llmaudit_retention_in_months": 1,
+    "profile": "lite"
+  },
+  "llmgateway": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "automationsolutions": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "autopiloteveryone": {
+    "enabled": false,
+    "profile": "lite"
+  },
+  "maestro": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "taas": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "a4d": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "agents": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "agenthub": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "platform": {
+    "enabled": true,
+    "external_object_storage": {
+      "bucket_name": "as-bucket"
+    },
+    "profile": "lite"
+  },
+  "storage_class": "bs-ssd",
+  "storage_class_single_replica": "bs-ssd",
+  "storage_class_name_with_rwx_support": "nfs-subdir-external-sc",
+  "infra": {
+    "docker_registry": {}
+  },
+  "snapshot": {
+    "enabled": false
+  },
+  "exclude_components": [
+    "monitoring",
+    "argocd",
+    "logging",
+    "gatekeeper",
+    "dapr",
+    "velero",
+    "alerts",
+    "network-policies",
+    "cert-manager",
+    "istio"
+  ],
+  "ingress": {
+    "namespace": "istio-system",
+    "gateway_selector": {
+      "istio": "ingressgateway"
+    },
+    "ingress_gateway_secret": "istio-ingressgateway-certs",
+    "istio_gateway_service_name": "istio-ingressgateway"
+  },
+  "argocd": {
+    "application_namespace": "argocd",
+    "project": "uipath"
+  }
+}
