@@ -1,0 +1,69 @@
+# ArgoCD Helm Chart Values for Samsung Cloud SKE (Airgapped)
+#
+# Install command:
+#   helm install argocd \
+#     oci://<registry>/helm/argo/argo-cd \
+#     --version 10.1.1 \
+#     -n argocd --create-namespace \
+#     -f argocd-values.yaml --wait
+
+global:
+  # Override images for airgapped environment
+  image:
+    repository: "<TARGET_REGISTRY>/mirror/argocd"
+    tag: "v3.4.4"
+
+# ArgoCD Server
+server:
+  service:
+    type: ClusterIP
+  # Disable TLS on server (TLS terminated at Istio gateway)
+  extraArgs:
+    - --insecure
+
+# Redis (bundled)
+redis:
+  image:
+    repository: "<TARGET_REGISTRY>/mirror/redis"
+    tag: "7.4.2-alpine"
+
+# Dex (OIDC provider)
+dex:
+  image:
+    repository: "<TARGET_REGISTRY>/mirror/dex"
+    tag: "v2.41.1"
+
+# Repo Server
+repoServer:
+  image:
+    repository: "<TARGET_REGISTRY>/mirror/argocd"
+    tag: "v3.4.4"
+
+# Application Controller
+controller:
+  image:
+    repository: "<TARGET_REGISTRY>/mirror/argocd"
+    tag: "v3.4.4"
+
+# ApplicationSet Controller
+applicationSet:
+  image:
+    repository: "<TARGET_REGISTRY>/mirror/argocd"
+    tag: "v3.4.4"
+
+# Notifications Controller
+notifications:
+  image:
+    repository: "<TARGET_REGISTRY>/mirror/argocd"
+    tag: "v3.4.4"
+
+# ConfigMap configurations
+configs:
+  params:
+    # Run server without TLS (Istio handles TLS)
+    server.insecure: true
+  cm:
+    # Timeout for application sync
+    timeout.reconciliation: 180s
+    # Admin enabled
+    admin.enabled: "true"

@@ -1,0 +1,70 @@
+# =============================================================================
+# csi-bs-node DaemonSet toleration 패치
+# =============================================================================
+# 목적:
+#   삼성SDS Cloud 블록스토리지 CSI(bs.csi.samsungsdscloud.com)의 node 플러그인
+#   DaemonSet(csi-bs-node)이 taint가 걸린 노드에도 배포되도록 toleration 추가.
+#
+# 배경(문제 원인):
+#   - asrobot 노드풀에는 taint `serverless.robot=present:NoSchedule` 존재
+#   - csi-bs-node DaemonSet에 toleration이 없어 해당 노드에 파드 배포 불가
+#   - 결과적으로 해당 노드의 CSINode에 topology 키가 등록되지 않아
+#     bs-ssd StorageClass PVC 프로비저닝 실패:
+#     "no topology key found on CSINode ske-worker-asrobot-*"
+#
+# 해결:
+#   CSI node 플러그인은 볼륨을 사용할 수 있는 모든 노드에 떠 있어야 하므로
+#   관례에 따라 모든 taint를 tolerate(operator: Exists)하도록 설정.
+#
+# 적용 대상:
+#   namespace : kube-system
+#   daemonset : csi-bs-node
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 적용 방법 (택 1)
+# -----------------------------------------------------------------------------
+# [방법 A] strategic merge patch 파일로 적용 (권장)
+#   kubectl patch daemonset csi-bs-node -n kube-system \
+#     --type merge --patch-file csi-bs-node-toleration-patch.yaml
+#
+# [방법 B] 인라인 patch 로 적용
+#   kubectl patch ds csi-bs-node -n kube-system --type merge \
+#     -p '{"spec":{"template":{"spec":{"tolerations":[{"operator":"Exists"}]}}}}'
+#
+# -----------------------------------------------------------------------------
+# 적용 후 검증
+# -----------------------------------------------------------------------------
+#   # 1) DaemonSet이 모든 노드에 배포됐는지 (DESIRED == 전체 워커 수)
+#   kubectl get ds csi-bs-node -n kube-system
+#
+#   # 2) taint 걸린 노드에 파드가 떴는지
+#   kubectl get pods -n kube-system -o wide | grep csi-bs-node
+#
+#   # 3) 해당 노드 CSINode에 topology 키가 등록됐는지
+#   kubectl get csinode <NODE_NAME> \
+#     -o jsonpath='{range .spec.drivers[*]}{.name}{" | "}{.topologyKeys}{"\n"}{end}'
+#     # 기대값: bs.csi.samsungsdscloud.com | ["topology.bs.csi.samsungsdscloud.com/zone"]
+#
+# -----------------------------------------------------------------------------
+# 롤백 (원복)
+# -----------------------------------------------------------------------------
+#   kubectl patch ds csi-bs-node -n kube-system --type json \
+#     -p '[{"op":"remove","path":"/spec/template/spec/tolerations"}]'
+#
+# =============================================================================
+# 아래는 kubectl patch --patch-file 로 사용할 strategic merge patch 본문
+# =============================================================================
+spec:
+  template:
+    spec:
+      tolerations:
+        # 모든 taint를 tolerate — CSI node 플러그인 표준 구성.
+        # (특정 taint만 허용하려면 아래 예시로 대체 가능)
+        - operator: Exists
+
+        # [대안] serverless.robot taint 만 명시적으로 허용하고 싶은 경우:
+        # - key: "serverless.robot"
+        #   operator: "Equal"
+        #   value: "present"
+        #   effect: "NoSchedule"

@@ -1,0 +1,84 @@
+# CoreDNS Custom Configuration for UiPath Automation Suite
+#
+# Purpose:
+#   Ensure in-cluster pods can resolve the Automation Suite FQDN.
+#   UiPath uses a "hairpin" pattern where all inter-service communication
+#   goes through the external FQDN (for Identity Server token validation,
+#   S2S authentication, and cross-product API calls).
+#
+# When to use:
+#   - If your FQDN is NOT publicly resolvable (internal domain)
+#   - If CoreDNS cannot forward to a DNS server that knows your domain
+#
+# Apply:
+#   kubectl apply -f coredns-custom-config.yaml
+#   kubectl -n kube-system rollout restart deployment coredns
+#
+# Verify:
+#   kubectl run dns-test --rm -it --image=busybox --restart=Never -- nslookup ske.myrobots.co.kr
+#   kubectl run dns-test --rm -it --image=busybox --restart=Never -- nslookup alm.ske.myrobots.co.kr
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health {
+            lameduck 5s
+        }
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+            pods insecure
+            fallthrough in-addr.arpa ip6.arpa
+            ttl 30
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf {
+            max_concurrent 1000
+        }
+        cache 30
+        loop
+        reload
+        loadbalance
+        # Static host entries for FQDN resolution within the cluster
+        # Maps the FQDN and wildcard subdomains to the Istio Ingress Gateway LB IP
+        hosts {
+            123.41.32.188 ske.myrobots.co.kr
+            123.41.32.188 alm.ske.myrobots.co.kr
+            123.41.32.188 monitoring.ske.myrobots.co.kr
+            123.41.32.188 insights.ske.myrobots.co.kr
+            123.41.32.188 apps.ske.myrobots.co.kr
+            fallthrough
+        }
+    }
+
+# Alternative: If you have a corporate DNS server that can resolve the FQDN,
+# use a forward block instead of static hosts:
+#
+#  Corefile: |
+#    .:53 {
+#        errors
+#        health { lameduck 5s }
+#        ready
+#        kubernetes cluster.local in-addr.arpa ip6.arpa {
+#            pods insecure
+#            fallthrough in-addr.arpa ip6.arpa
+#            ttl 30
+#        }
+#        prometheus :9153
+#        forward . /etc/resolv.conf { max_concurrent 1000 }
+#        cache 30
+#        loop
+#        reload
+#        loadbalance
+#    }
+#    # Forward queries for your domain to corporate DNS
+#    myrobots.co.kr:53 {
+#        errors
+#        cache 30
+#        forward . 10.0.0.53
+#    }
